@@ -4,13 +4,14 @@ namespace API.DTOs
 {
     public class RegisterDto
     {
-        [EmailAddress(ErrorMessage ="Provide Email")]
-        public string Email { get; set;}
+        [EmailAddress(ErrorMessage = "Provide Email")]
+        public string Email { get; set; }
+
         [Required(ErrorMessage = "Password field is required")]
-        public string Password { get; set;}
+        [StringLength(8, MinimumLength = 4)]
+        public string Password { get; set; }
+
         [Required(ErrorMessage = "Name field is required")]
-        public string UserName { get; set;}
+        public string UserName { get; set; }
     }
-
 }
-
