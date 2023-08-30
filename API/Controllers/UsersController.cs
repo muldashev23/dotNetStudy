@@ -1,39 +1,36 @@
-﻿using API.Data;
+﻿using API.DTOs;
 using API.Entities;
+using API.Intefaces;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
-{   
+{
     [Authorize]
-    public class UsersController: BaseApiController
-    {   
-        private readonly DataContext _context;
-        public UsersController(DataContext context)
+    public class UsersController : BaseApiController
+    {
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
+
+        public UsersController(IUserRepository userRepository, IMapper mapper)
         {
-            _context = context;
+            _userRepository = userRepository;
+            _mapper = mapper;
         }
-        [AllowAnonymous]
+
         [HttpGet] // GET http://loca....../api/users
-        public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<MemberDTO>>> GetUsers()
         {
-            var users = await _context.Users.ToListAsync();
-            return users;
+            var users = await _userRepository.GetMembersAsync();
+            return Ok(users);
         }
-        [HttpGet("{id}")] // GET http://loca....../api/users/{id}
-        public async Task<ActionResult<AppUser>> GetUser(int id)
+
+        [HttpGet("{username}")] // GET http://loca....../api/users/{id}
+        public async Task<ActionResult<MemberDTO>> GetUser([FromRoute] string username)
         {
-            var user = await _context.Users.FindAsync(id);
-            return user;
-        }
-        [HttpPost] //Post http://loca....../api/users
-        public ActionResult<AppUser> PostUser([FromBody]AppUser user)
-        {
-            _context.Users.Add(user);
-            _context.SaveChanges();
-            return user;
+            return await _userRepository.GetMemberAsync(username);
         }
     }
-    
 }
